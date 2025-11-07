@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ajouter un livre</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      background: linear-gradient(to bottom, #8B4513, #D2B48C);
+      color: white;
+    }
+    h1 { text-align: center; }
+    a { text-decoration: none; color: #fff; margin-bottom: 20px; display: inline-block; }
+    form { max-width: 300px; margin: auto; }
+    input, label, button { display: block; width: 100%; margin-bottom: 10px; padding: 5px; }
+  </style>
+</head>
+<body>
+
+  <h1>Ajouter un livre</h1>
+  <a href="catalogue.html">⬅ Retour au catalogue</a>
+
+  <form id="form">
+    <input type="number" id="code" placeholder="Code" min="1" required>
+    <input type="text" id="titre" placeholder="Titre" required>
+    <input type="text" id="auteur" placeholder="Auteur" required>
+    <input type="number" id="annee" placeholder="Année" min="1900" required>
+    <input type="number" id="prix" placeholder="Prix (DH)" min="0" required>
+    
+    <!-- Checkbox مفعلة صح -->
+    <div style="margin-bottom:10px;">
+      <input type="checkbox" id="disponible" checked>
+      <label for="disponible" style="color:white;">Disponible</label>
+    </div>
+    
+    <button type="submit">Ajouter</button>
+  </form>
+
+  <script>
+    let bibliotheque = JSON.parse(localStorage.getItem("bibliotheque")) || [];
+
+    const anneeInput = document.getElementById("annee");
+    const currentYear = new Date().getFullYear();
+    anneeInput.max = currentYear;
+
+    function sauvegarder() { localStorage.setItem("bibliotheque", JSON.stringify(bibliotheque)); }
+
+    document.getElementById("form").addEventListener("submit", function(e){
+      e.preventDefault();
+      const anneeValue = parseInt(anneeInput.value);
+
+      if (anneeValue < 1900 || anneeValue > currentYear) {
+        alert(`⚠ Année invalide ! Entrez une valeur entre 1900 et ${currentYear}.`);
+        return;
+      }
+
+      const livre = {
+        code: parseInt(document.getElementById("code").value),
+        titre: document.getElementById("titre").value,
+        auteur: document.getElementById("auteur").value,
+        annee: anneeValue,
+        prix: parseFloat(document.getElementById("prix").value),
+        disponible: document.getElementById("disponible").checked
+      };
+
+      bibliotheque.push(livre);
+      sauvegarder();
+      alert("Livre ajouté avec succès !");
+      window.location.href = "catalogue.html";
+    });
+  </script>
+
+</body>
+</html>
