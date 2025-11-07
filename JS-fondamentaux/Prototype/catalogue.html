@@ -2,95 +2,87 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Catalogue des livres</title>
+  <title>Catalogue</title>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      margin: 20px; 
-      background: linear-gradient(to bottom, #8B4513, #D2B48C);
-      color: white;
+    body { font-family: Arial; margin: 20px; }
+    .card {
+      border: 1px solid #ccc; border-radius: 10px;
+      padding: 10px; margin-bottom: 10px;
+      background-color: #f9f9f9;
     }
-    h1 { text-align: center; }
-    a { text-decoration: none; color: #fff; margin-bottom: 20px; display: inline-block; }
-    .carte { 
-      border: 1px solid black; 
-      padding: 10px; 
-      margin-bottom: 10px; 
-      background-color: #F5DEB3; 
-      color: black;
-    }
-    button { margin-top: 5px; padding: 5px; }
-    footer { text-align: center; margin-top: 20px; font-weight: bold; }
-    input { padding: 5px; margin-bottom: 10px; }
+    button { margin: 5px; }
+    a { display: inline-block; margin-bottom: 20px; text-decoration: none; color: blue; }
   </style>
 </head>
 <body>
 
   <h1>Catalogue des livres</h1>
-  <a href="ajouter-livre.html">Ajouter un nouveau livre</a>
+  <a href="ajouter-livre.html">➕ Ajouter un livre</a>
 
-  <input type="text" id="search" placeholder="Rechercher un livre...">
-  <button onclick="rechercher()">Chercher</button>
-  <button onclick="afficherLivres()">Tout afficher</button>
-
-  <div id="liste"></div>
-  <footer id="stats"></footer>
+  <div id="books"></div>
 
   <script>
-    let bibliotheque = JSON.parse(localStorage.getItem("bibliotheque")) || [
+    const bibliotheque = [
       { code: 12, titre: "Clean Code", auteur: "Robert C. Martin", annee: 2008, disponible: true, prix: 150 },
-      { code: 45, titre: "Eloquent JavaScript", auteur: "Marijn Haverbeke", annee: 2018, disponible: true, prix: 200 }
+      { code: 45, titre: "Eloquent JavaScript", auteur: "Marijn Haverbeke", annee: 2018, disponible: true, prix: 200 },
     ];
 
-    function sauvegarder() { localStorage.setItem("bibliotheque", JSON.stringify(bibliotheque)); }
+    const booksDiv = document.getElementById("books");
 
-    function afficherLivres(liste = bibliotheque) {
-      const div = document.getElementById("liste");
-      div.innerHTML = "";
-      liste.forEach(livre => {
-        const card = document.createElement("div");
-        card.className = "carte";
-        card.innerHTML = `
-          <h3>${livre.titre}</h3>
-          <p>Auteur : ${livre.auteur}</p>
-          <p>Année : ${livre.annee}</p>
-          <p>Prix : ${livre.prix} DH</p>
-          <p>${livre.disponible ? "Disponible" : "Emprunté"}</p>
-          <button onclick="supprimerLivre(${livre.code})">Supprimer</button>
-          <button onclick="changerDisponibilite(${livre.code})">${livre.disponible ? "Emprunter" : "Retourner"}</button>
-        `;
-        div.appendChild(card);
+    function afficherCatalogue() {
+      booksDiv.innerHTML = "";
+      bibliotheque.forEach(livre => afficherLivre(livre));
+    }
+
+    function afficherLivre(livre) {
+      let card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <h3>${livre.titre}</h3>
+        <p>Auteur: ${livre.auteur}</p>
+        <p>Année: ${livre.annee}</p>
+        <p>Prix: ${livre.prix} DH</p>
+      `;
+
+      let btnReserve = document.createElement("button");
+      btnReserve.textContent = livre.disponible ? "Réserver" : "Réservé";
+      btnReserve.disabled = !livre.disponible;
+
+      btnReserve.addEventListener("click", () => {
+        livre.disponible = false;
+        btnReserve.textContent = "Réservé";
+        btnReserve.disabled = true;
       });
-      majStats();
+
+      let btnRetour = document.createElement("button");
+      btnRetour.textContent = "Annuler réservation";
+      btnRetour.addEventListener("click", () => {
+        livre.disponible = true;
+        btnReserve.textContent = "Réserver";
+        btnReserve.disabled = false;
+      });
+
+      let btnSupprimer = document.createElement("button");
+      btnSupprimer.textContent = "Supprimer";
+      btnSupprimer.addEventListener("click", () => {
+        supprimerLivre(livre.code);
+      });
+
+      card.appendChild(btnReserve);
+      card.appendChild(btnRetour);
+      card.appendChild(btnSupprimer);
+      booksDiv.appendChild(card);
     }
 
     function supprimerLivre(code) {
-      bibliotheque = bibliotheque.filter(l => l.code !== code);
-      sauvegarder();
-      afficherLivres();
+      const index = bibliotheque.findIndex(l => l.code === code);
+      if (index !== -1) {
+        bibliotheque.splice(index, 1);
+        afficherCatalogue();
+      }
     }
 
-    function changerDisponibilite(code) {
-      const livre = bibliotheque.find(l => l.code === code);
-      if (livre) livre.disponible = !livre.disponible;
-      sauvegarder();
-      afficherLivres();
-    }
-
-    function rechercher() {
-      const mot = document.getElementById("search").value.toLowerCase();
-      const resultats = bibliotheque.filter(l => l.titre.toLowerCase().includes(mot));
-      afficherLivres(resultats);
-    }
-
-    function majStats() {
-      const total = bibliotheque.length;
-      const dispo = bibliotheque.filter(l => l.disponible).length;
-      document.getElementById("stats").innerText =
-        `Total: ${total} | Disponibles: ${dispo}`;
-    }
-
-    afficherLivres();
+    afficherCatalogue();
   </script>
 
 </body>
