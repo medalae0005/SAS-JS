@@ -1,38 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>To-Do App</title>
-
-  <style>
-    label {
-      font-family: 'Courier New', Courier, monospace;
-    }
-  </style>
-</head>
-
-<body>
-  <label for="todo-input">Write here:</label>
-  <input type="text" name="todo" id="todo-input" />
-  <button type="button" id="add-btn">Add</button>
-  <ul></ul>
-
-  <script>
-    let inpt = document.getElementById("todo-input");
-    let btn = document.getElementById("add-btn");
-    let lists = document.querySelector("ul");
-
-    btn.addEventListener("click", function() {
-      if (inpt.value.trim()) {
-        let li = document.createElement("li");
-        li.textContent = inpt.value;
-        inpt.value = "";
-        lists.appendChild(li);
-      } else {
-        alert("Please write something before adding!");
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>exercice</title>
+    <style>
+      p {
+        color: red;
       }
-    });
-  </script>
-</body>
+      li:nth-child(even) {
+        color: aquamarine;
+      }
+
+      label {
+        font-family: 'Courier New', Courier, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <label for="hb">Just write (what do you want to do ?) : </label>
+    <input type="text" id="txt" name="hb" placeholder="Ex: studying" />
+    <button id="btn">Add</button>
+    <ul></ul>
+    <script>
+      let inpt = document.getElementById("txt");
+      let msg = document.createElement("p");
+
+      let list = document.querySelector("ul");
+      list.before(msg);
+
+      let btn = document.getElementById("btn");
+
+      btn.addEventListener("click", function () {
+        if (inpt.value.trim()) {
+          let li = document.createElement("li");
+          li.textContent = inpt.value;
+          list.appendChild(li);
+          inpt.value = "";
+          msg.innerText = "";
+        } else {
+          msg.innerText = "Write something :(";
+        }
+      });
+    </script>
+  </body>
 </html>
